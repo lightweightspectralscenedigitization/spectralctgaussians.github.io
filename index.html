@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Primary Meta Tags -->
+  <meta name="title" content="SpectralCTGaussians: Projection-Domain Reconstruction and Basis Material Decomposition for Spectral CT using 3D Gaussian Splatting - Vos, Sinha, Weinmann">
+  <meta name="description" content="SpectralCTGaussians adds per-Gaussian basis material fractions and a differentiable polychromatic forward model to 3D Gaussian Splatting, enabling spectral CT novel view synthesis, volume reconstruction and one-step basis material decomposition from a single shared representation.">
+  <meta name="keywords" content="spectral CT, 3D Gaussian Splatting, basis material decomposition, polychromatic forward model, photoelectric absorption, Compton scattering, K-edge, cone-beam CT, tomographic reconstruction, novel view synthesis">
+  <meta name="author" content="Reinout Vos, Saptarshi Neil Sinha, Michael Weinmann">
+  <meta name="robots" content="index, follow">
+  <meta name="language" content="English">
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Delft University of Technology / Fraunhofer IGD">
+  <meta property="og:title" content="SpectralCTGaussians: Projection-Domain Reconstruction and Basis Material Decomposition for Spectral CT using 3D Gaussian Splatting">
+  <meta property="og:description" content="A spectral Gaussian representation for CT: energy-dependent basis coefficients optimized jointly across all energy channels, with one-step material decomposition via mean-shift clustering.">
+  <!-- TODO: Replace with your actual website URL -->
+  <meta property="og:url" content="https://YOUR_DOMAIN.com/spectralctgaussians">
+  <!-- TODO: Create a 1200x630px preview image and update path -->
+  <meta property="og:image" content="https://YOUR_DOMAIN.com/static/images/social_preview.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:image:alt" content="SpectralCTGaussians - Research Preview">
+  <meta property="article:published_time" content="2026-09-01T00:00:00.000Z">
+  <meta property="article:author" content="Reinout Vos">
+  <meta property="article:section" content="Research">
+  <meta property="article:tag" content="spectral CT">
+  <meta property="article:tag" content="3D Gaussian Splatting">
+
+  <!-- Twitter -->
+  <meta name="twitter:card" content="summary_large_image">
+  <!-- TODO: Replace with your lab/institution Twitter handle -->
+  <meta name="twitter:site" content="@YOUR_TWITTER_HANDLE">
+  <!-- TODO: Replace with first author's Twitter handle -->
+  <meta name="twitter:creator" content="@AUTHOR_TWITTER_HANDLE">
+  <meta name="twitter:title" content="SpectralCTGaussians: Spectral CT Reconstruction and Material Decomposition with 3D Gaussian Splatting">
+  <meta name="twitter:description" content="A single spectral Gaussian representation for novel view synthesis, spectral CT reconstruction and one-step basis material decomposition.">
+  <meta name="twitter:image" content="https://YOUR_DOMAIN.com/static/images/social_preview.png">
+  <meta name="twitter:image:alt" content="SpectralCTGaussians - Research Preview">
+
+  <!-- Academic/Research Specific -->
+  <meta name="citation_title" content="SpectralCTGaussians: Projection-Domain Reconstruction and Basis Material Decomposition for Spectral CT using 3D Gaussian Splatting">
+  <meta name="citation_author" content="Vos, Reinout">
+  <meta name="citation_author" content="Sinha, Saptarshi Neil">
+  <meta name="citation_author" content="Weinmann, Michael">
+  <meta name="citation_publication_date" content="2026">
+  <meta name="citation_technical_report_institution" content="arXiv preprint">
+  <meta name="citation_pdf_url" content="https://YOUR_DOMAIN.com/static/pdfs/paper.pdf">
+
+  <!-- Additional SEO -->
+  <meta name="theme-color" content="#2563eb">
+  <meta name="msapplication-TileColor" content="#2563eb">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+  <!-- Preconnect for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preconnect" href="https://ajax.googleapis.com">
+  <link rel="preconnect" href="https://cdn.jsdelivr.net">
+
+  <title>SpectralCTGaussians: Spectral CT Reconstruction &amp; Basis Material Decomposition with 3D Gaussian Splatting</title>
+
+  <!-- Critical CSS -->
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+
+  <!-- Non-critical CSS -->
+  <link rel="preload" href="static/css/bulma-carousel.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="static/css/bulma-slider.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="static/css/fontawesome.all.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+  <link rel="preload" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css" as="style" onload="this.onload=null;this.rel='stylesheet'">
+
+  <noscript>
+    <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
+    <link rel="stylesheet" href="static/css/bulma-slider.min.css">
+    <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  </noscript>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script defer src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="static/js/fontawesome.all.min.js"></script>
+  <script defer src="static/js/bulma-carousel.min.js"></script>
+  <script defer src="static/js/bulma-slider.min.js"></script>
+  <script defer src="static/js/index.js"></script>
+
+  <!-- Structured Data for Academic Papers -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "ScholarlyArticle",
+      "headline": "SpectralCTGaussians: Projection-Domain Reconstruction and Basis Material Decomposition for Spectral CT using 3D Gaussian Splatting",
+      "description": "A spectral 3D Gaussian Splatting representation for CT that jointly enables novel view synthesis, spectral volume reconstruction and one-step basis material decomposition through a differentiable polychromatic forward model.",
+      "author": [
+        {
+          "@type": "Person",
+          "name": "Reinout Vos",
+          "affiliation": { "@type": "Organization", "name": "Delft University of Technology, Delft, Netherlands" }
+        },
+        {
+          "@type": "Person",
+          "name": "Saptarshi Neil Sinha",
+          "affiliation": { "@type": "Organization", "name": "Fraunhofer IGD, Darmstadt, Germany" }
+        },
+        {
+          "@type": "Person",
+          "name": "Michael Weinmann",
+          "affiliation": { "@type": "Organization", "name": "Delft University of Technology, Delft, Netherlands" }
+        }
+      ],
+      "datePublished": "2026-09-01",
+      "publisher": { "@type": "Organization", "name": "arXiv" },
+      "url": "https://YOUR_DOMAIN.com/spectralctgaussians",
+      "image": "https://YOUR_DOMAIN.com/static/images/social_preview.png",
+      "keywords": ["spectral CT", "3D Gaussian Splatting", "basis material decomposition", "polychromatic forward model", "K-edge", "cone-beam CT", "tomographic reconstruction"],
+      "abstract": "Spectral computed tomography (CT) extends conventional CT by measuring attenuation across multiple energy channels, allowing improved modeling of physical X-ray interactions and energy-dependent material behavior and leading to richer scene understanding. We present a novel method for spectral CT reconstruction and basis material decomposition using 3D Gaussian Splatting by adding per-Gaussian basis material fractions to the set of learnable parameters, which together with a set of energy-dependent basis functions define the attenuation across the full spectral range. The basis functions represent various physical attenuation models such as photoelectric absorption and Compton scattering, and are jointly optimized across all energy channels through a differentiable polychromatic forward model, with material decomposition performed via mean-shift clustering of the resulting coefficients. We evaluate our method on a baseline real-world dataset as well as a synthetic dataset that we introduce, comparing against traditional reconstruction algorithms and state-of-the-art learning-based CT reconstruction methods. Our approach outperforms all traditional baselines in novel view synthesis and achieves the best PSNR among all compared methods for spectral CT volume reconstruction, while describing all energy channels with a single shared representation that requires a number of Gaussians comparable to single-channel Gaussian splatting-based CT reconstruction approaches. For basis material decomposition, no traditional or learning-based baseline offers one-step decomposition with direct RGB material segmentation, and our method additionally recovers the photoelectric basis with higher PSNR than traditional pipelines.",
+      "isAccessibleForFree": true,
+      "license": "https://creativecommons.org/licenses/by/4.0/",
+      "mainEntity": { "@type": "WebPage", "@id": "https://YOUR_DOMAIN.com/spectralctgaussians" },
+      "about": [
+        { "@type": "Thing", "name": "Spectral Computed Tomography" },
+        { "@type": "Thing", "name": "3D Gaussian Splatting" }
+      ]
+    }
+  </script>
+
+  <!-- Website/Organization Structured Data -->
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Delft University of Technology",
+      "url": "https://www.tudelft.nl/",
+      "logo": "https://YOUR_DOMAIN.com/static/images/favicon.ico",
+      "sameAs": [
+        "https://twitter.com/YOUR_TWITTER_HANDLE",
+        "https://github.com/YOUR_GITHUB_USERNAME"
+      ]
+    }
+  </script>
+</head>
+<body>
+
+<!-- Scroll to Top Button -->
+<button class="scroll-to-top" onclick="scrollToTop()" title="Scroll to top" aria-label="Scroll to top">
+  <i class="fas fa-chevron-up"></i>
+</button>
+
+<!-- More Works Dropdown -->
+<div class="more-works-container">
+  <button class="more-works-btn" onclick="toggleMoreWorks()" title="View More Works from Our Lab">
+    <i class="fas fa-flask"></i>
+    More Works
+    <i class="fas fa-chevron-down dropdown-arrow"></i>
+  </button>
+  <div class="more-works-dropdown" id="moreWorksDropdown">
+    <div class="dropdown-header">
+      <h4>Related Work</h4>
+      <button class="close-btn" onclick="toggleMoreWorks()">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <div class="works-list">
+      <a href="https://arxiv.org/abs/2405.20693" class="work-item" target="_blank" rel="noopener">
+        <div class="work-info">
+          <h5>R2-Gaussian: Rectifying Radiative Gaussian Splatting for Tomographic Reconstruction</h5>
+          <p>Single-channel Gaussian splatting for CT with a differentiable rasterizer and voxelizer, which our spectral rasterizer extends to multiple basis channels.</p>
+          <span class="work-venue">NeurIPS 2024</span>
+        </div>
+        <i class="fas fa-external-link-alt"></i>
+      </a>
+      <a href="https://arxiv.org/abs/2403.04116" class="work-item" target="_blank" rel="noopener">
+        <div class="work-info">
+          <h5>X-Gaussian: Radiative Gaussian Splatting for Efficient X-Ray Novel View Synthesis</h5>
+          <p>Attenuation-based Gaussian representation for X-ray novel view synthesis, used as a single-channel baseline.</p>
+          <span class="work-venue">ECCV 2024</span>
+        </div>
+        <i class="fas fa-external-link-alt"></i>
+      </a>
+      <a href="https://arxiv.org/abs/2408.06975" class="work-item" target="_blank" rel="noopener">
+        <div class="work-info">
+          <h5>SpectralGaussians: Semantic, Spectral 3D Gaussian Splatting for Multi-Spectral Scene Representation</h5>
+          <p>Spectral Gaussian splatting for optical multi-spectral scenes, motivating a spectral representation for X-ray attenuation.</p>
+          <span class="work-venue">2024</span>
+        </div>
+        <i class="fas fa-external-link-alt"></i>
+      </a>
+    </div>
+  </div>
+</div>
+
+<main id="main-content">
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title">SpectralCTGaussians: Projection-Domain Reconstruction and Basis Material Decomposition for Spectral CT using 3D Gaussian Splatting</h1>
+            <div class="is-size-5 publication-authors">
+              <span class="author-block">
+                <a href="mailto:R.H.A.Vos@student.tudelft.nl" target="_blank">Reinout Vos</a><sup>1</sup>,</span>
+              <span class="author-block">
+                <a href="mailto:saptarshineilsinha@gmail.com" target="_blank">Saptarshi Neil Sinha</a><sup>2*</sup>,</span>
+              <span class="author-block">
+                <a href="mailto:m.weinmann@tudelft.nl" target="_blank">Michael Weinmann</a><sup>1*</sup>
+              </span>
+            </div>
+
+            <div class="is-size-5 publication-authors">
+              <span class="author-block">
+                <sup>1</sup>Delft University of Technology, Delft, Netherlands &nbsp;
+                <sup>2</sup>Fraunhofer IGD, Darmstadt, Germany
+                <br>arXiv preprint, August 2026
+              </span>
+              <span class="eql-cntrb"><small><br><sup>*</sup>Corresponding author</small></span>
+            </div>
+
+            <div class="column has-text-centered">
+              <div class="publication-links">
+                <!-- TODO: Update with your arXiv paper ID once assigned -->
+                <span class="link-block">
+                  <a href="https://arxiv.org/abs/&lt;ARXIV PAPER ID&gt;" target="_blank" rel="noopener"
+                     class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon"><i class="ai ai-arxiv"></i></span>
+                    <span>arXiv paper link</span>
+                  </a>
+                </span>
+
+                <!-- Supplementary material -->
+                <span class="link-block">
+                  <a href="static/pdfs/supplementary_material.pdf" target="_blank" rel="noopener"
+                     class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon"><i class="fas fa-file-pdf"></i></span>
+                    <span>Supplementary</span>
+                  </a>
+                </span>
+
+                <!-- TODO: Replace with your GitHub repository URL once the code is released -->
+                <span class="link-block">
+                  <a class="external-link button is-normal is-rounded is-dark" disabled
+                     title="Code release is planned — check back soon">
+                    <span class="icon"><i class="fab fa-github"></i></span>
+                    <span>Code (upcoming)</span>
+                  </a>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Teaser figure -->
+  <section class="hero teaser">
+    <div class="container is-max-desktop">
+      <div class="hero-body">
+        <figure class="image">
+          <img src="static/images/pipeline.png"
+               alt="Overview of SpectralCTGaussians: cone-beam projections optimize a spectral 3D Gaussian Splatting model whose Gaussians encode geometry, density and basis material coefficients"/>
+        </figure>
+        <h2 class="subtitle has-text-centered">
+          <b>Overview of SpectralCTGaussians.</b> Cone-beam projections optimize a 3D Gaussian Splatting model in which
+          each Gaussian encodes geometry, density and basis material coefficients, supervised by the difference between
+          rendered and measured log-projections across all energy channels. Mean-shift clustering of the optimized
+          coefficients yields material maps.
+        </h2>
+      </div>
+    </div>
+  </section>
+  <!-- End teaser figure -->
+
+  <!-- Paper abstract -->
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered has-text-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3">Abstract</h2>
+          <div class="content has-text-justified">
+            <p>
+              Spectral computed tomography (CT) extends conventional CT by measuring attenuation across multiple energy
+              channels, allowing improved modeling of physical X-ray interactions and energy-dependent material behavior
+              and leading to richer scene understanding. We present a novel method for spectral CT reconstruction and
+              basis material decomposition using <strong>3D Gaussian Splatting</strong> by adding per-Gaussian basis
+              material fractions to the set of learnable parameters, which together with a set of energy-dependent basis
+              functions define the attenuation across the full spectral range.
+            </p>
+            <p>
+              The basis functions represent various physical attenuation models such as photoelectric absorption and
+              Compton scattering, and are jointly optimized across all energy channels through a differentiable
+              polychromatic forward model, with material decomposition performed via mean-shift clustering of the
+              resulting coefficients. We evaluate our method on a baseline real-world dataset as well as a synthetic
+              dataset that we introduce, comparing against traditional reconstruction algorithms and state-of-the-art
+              learning-based CT reconstruction methods. Our approach outperforms all traditional baselines in novel view
+              synthesis and achieves the best PSNR among all compared methods for spectral CT volume reconstruction,
+              while describing all energy channels with a single shared representation that requires a number of
+              Gaussians comparable to single-channel Gaussian splatting-based CT reconstruction approaches. For basis
+              material decomposition, no traditional or learning-based baseline offers one-step decomposition with
+              direct RGB material segmentation, and our method additionally recovers the photoelectric basis with higher
+              PSNR than traditional pipelines.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- End paper abstract -->
+
+  <!-- Contributions -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column is-four-fifths">
+          <h2 class="title is-3 has-text-centered">Contributions</h2>
+          <div class="content has-text-justified">
+            <ul>
+              <li>We introduce a <strong>spectral Gaussian representation for CT</strong>, extending Gaussian-splatting-based
+                CT reconstruction from a single density field to a spectral representation in which energy-dependent basis
+                coefficient values are included directly in the optimization.</li>
+              <li>We extend the <strong>differentiable CT rasterizer and voxelizer</strong> to compute basis-coefficient
+                line integrals and embed them in a polychromatic forward projection model, so that all energy channels are
+                optimized jointly in a single efficient pass, using a number of Gaussians comparable to a single-channel
+                representation.</li>
+              <li>We enable <strong>one-step basis material decomposition</strong> by optimizing the basis coefficients
+                directly from the spectral projections following the photoelectric and Compton models of Alvarez and
+                Macovski, complemented by a <strong>learnable K-edge basis</strong> for contrast agents such as iodine and
+                for metals, and segment the resulting coefficients with mean-shift clustering into material maps with
+                direct RGB output.</li>
+              <li>We introduce a <strong>synthetic spectral CT dataset</strong> with ground-truth material information,
+                enabling quantitative evaluation of the decomposition.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- End contributions -->
+
+  <!-- Method summary -->
+  <section class="section hero is-light">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Method at a Glance</h2>
+      <div class="table-container">
+        <table class="table is-fullwidth is-striped is-hoverable">
+          <thead>
+          <tr><th>Stage</th><th>Component</th><th>Purpose</th><th>Output</th></tr>
+          </thead>
+          <tbody>
+          <tr>
+            <td>Preprocessing</td><td>Normalization &amp; log-transform</td>
+            <td>Converts raw counts to log-projections, reduces noise and unifies scanner geometry and spectral metadata</td>
+            <td>One folder per energy channel, 75 training / 100 test views</td>
+          </tr>
+          <tr>
+            <td rowspan="2">Representation</td><td>Geometry (position, scale, rotation) and density &rho;<sub>i</sub></td>
+            <td>Explicit differentiable 3D Gaussians shared across all energy channels</td>
+            <td>Up to 500k Gaussians, initialized from an FDK volume</td>
+          </tr>
+          <tr>
+            <td>Material functions f<sub>m,i</sub></td>
+            <td>Per-Gaussian basis fractions with &Sigma;<sub>m</sub> f<sub>m,i</sub> = 1, decoupling composition from geometry</td>
+            <td>Photoelectric, Compton and (optional) K-edge fractions</td>
+          </tr>
+          <tr>
+            <td rowspan="3">Rendering</td><td>Spectral rasterizer</td>
+            <td>Projects M basis channels instead of a single density (energy-agnostic, once per iteration)</td>
+            <td>Basis-coefficient projections of shape (M, H, W)</td>
+          </tr>
+          <tr>
+            <td>Basis functions &mu;&#771;<sub>m</sub>(E)</td>
+            <td>Photoelectric E<sup>&minus;3</sup>, Klein&ndash;Nishina Compton, learnable sigmoid K-edge</td>
+            <td>Energy-basis matrix B<sub>E</sub> &isin; R<sup>K&times;M</sup></td>
+          </tr>
+          <tr>
+            <td>Polychromatic forward model</td>
+            <td>Beer&ndash;Lambert integral discretized into K = 64 midpoint samples over [20, 140] keV</td>
+            <td>Rendered log-projection per energy channel</td>
+          </tr>
+          <tr>
+            <td>Training</td><td>L1 + D-SSIM + 3D/2D TV, Adam</td>
+            <td>Joint optimization of geometry, density, material functions and K-edge parameters (frozen for 2k warm-up iterations)</td>
+            <td>Optimized spectral Gaussian model (30k iterations)</td>
+          </tr>
+          <tr>
+            <td>Decomposition</td><td>Mean-shift clustering</td>
+            <td>Groups Gaussians in the feature space of density, photoelectric-to-Compton ratio and K-edge fraction</td>
+            <td>Material maps with direct RGB segmentation</td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+  <!-- End method summary -->
+
+  <!-- Results tables -->
+  <section class="section">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Results</h2>
+
+      <h3 class="title is-5">Novel view synthesis on the multi-energy bird chest dataset</h3>
+      <p class="content">
+        PSNR, SSIM and LPIPS on the 100 held-out test projections. <em>Ours (2)</em> uses the photoelectric and Compton
+        bases, <em>Ours (3)</em> adds the learnable K-edge basis.
+      </p>
+      <div class="table-container">
+        <table class="table is-fullwidth is-striped is-narrow">
+          <thead>
+          <tr>
+            <th rowspan="2">Method</th>
+            <th colspan="3">50 keV</th><th colspan="3">80 keV</th><th colspan="3">120 keV</th><th colspan="3">Average</th>
+          </tr>
+          <tr>
+            <th>PSNR ↑</th><th>SSIM ↑</th><th>LPIPS ↓</th>
+            <th>PSNR ↑</th><th>SSIM ↑</th><th>LPIPS ↓</th>
+            <th>PSNR ↑</th><th>SSIM ↑</th><th>LPIPS ↓</th>
+            <th>PSNR ↑</th><th>SSIM ↑</th><th>LPIPS ↓</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr><td>FDK</td><td>27.86</td><td>0.627</td><td><strong>0.208</strong></td><td>30.28</td><td>0.669</td><td><strong>0.171</strong></td><td>31.43</td><td>0.683</td><td><strong>0.182</strong></td><td>29.85</td><td>0.660</td><td><strong>0.187</strong></td></tr>
+          <tr><td>SART</td><td>31.45</td><td>0.838</td><td>0.262</td><td>34.40</td><td>0.869</td><td>0.233</td><td>37.24</td><td>0.883</td><td>0.255</td><td>34.36</td><td>0.863</td><td>0.250</td></tr>
+          <tr><td>CGLS</td><td>31.19</td><td>0.785</td><td>0.244</td><td>34.14</td><td>0.833</td><td>0.216</td><td>37.13</td><td>0.872</td><td>0.242</td><td>34.15</td><td>0.830</td><td>0.234</td></tr>
+          <tr><td>PDHG-TV</td><td>31.75</td><td>0.824</td><td>0.269</td><td>34.34</td><td>0.855</td><td>0.237</td><td>36.71</td><td>0.876</td><td>0.258</td><td>34.27</td><td>0.852</td><td>0.255</td></tr>
+          <tr><td>IntraTomo</td><td>29.81</td><td>0.830</td><td>0.330</td><td>30.83</td><td>0.833</td><td>0.453</td><td>23.80</td><td>0.746</td><td>0.415</td><td>28.15</td><td>0.803</td><td>0.399</td></tr>
+          <tr><td>SAX-NeRF</td><td>33.58</td><td>0.906</td><td>0.271</td><td>35.08</td><td>0.887</td><td>0.380</td><td>25.63</td><td>0.769</td><td>0.343</td><td>31.43</td><td>0.854</td><td>0.332</td></tr>
+          <tr><td>X-Gaussian</td><td><strong>34.66</strong></td><td>0.931</td><td>0.220</td><td>21.14</td><td>0.866</td><td>0.194</td><td>20.97</td><td>0.764</td><td>0.303</td><td>25.59</td><td>0.854</td><td>0.239</td></tr>
+          <tr><td>R2-Gaussian</td><td>34.07</td><td><strong>0.939</strong></td><td>0.274</td><td><strong>37.43</strong></td><td><strong>0.958</strong></td><td>0.248</td><td><strong>40.50</strong></td><td><strong>0.960</strong></td><td>0.294</td><td><strong>37.33</strong></td><td><strong>0.953</strong></td><td>0.272</td></tr>
+          <tr><td>X-Field</td><td>27.31</td><td>0.866</td><td>0.298</td><td>26.99</td><td>0.854</td><td>0.415</td><td>32.22</td><td>0.897</td><td>0.331</td><td>28.84</td><td>0.872</td><td>0.348</td></tr>
+          <tr><td><strong>Ours (2)</strong></td><td>32.99</td><td>0.929</td><td>0.285</td><td>35.67</td><td>0.945</td><td>0.255</td><td>39.09</td><td>0.945</td><td>0.312</td><td>35.92</td><td>0.940</td><td>0.284</td></tr>
+          <tr><td><strong>Ours (3)</strong></td><td>33.76</td><td>0.930</td><td>0.282</td><td>36.79</td><td>0.949</td><td>0.254</td><td>39.03</td><td>0.949</td><td>0.313</td><td>36.52</td><td>0.943</td><td>0.283</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="title is-5">Spectral CT reconstruction on the multi-energy bird chest dataset</h3>
+      <p class="content">
+        Reconstructed volumes evaluated against a pseudo ground truth obtained by applying FDK to all available
+        projections per energy channel. X-Gaussian and X-Field do not produce volumes and are therefore excluded.
+      </p>
+      <div class="table-container">
+        <table class="table is-fullwidth is-striped is-narrow">
+          <thead>
+          <tr>
+            <th rowspan="2">Method</th>
+            <th colspan="3">50 keV</th><th colspan="3">80 keV</th><th colspan="3">120 keV</th><th colspan="3">Average</th>
+          </tr>
+          <tr>
+            <th>PSNR ↑</th><th>SSIM ↑</th><th>LPIPS ↓</th>
+            <th>PSNR ↑</th><th>SSIM ↑</th><th>LPIPS ↓</th>
+            <th>PSNR ↑</th><th>SSIM ↑</th><th>LPIPS ↓</th>
+            <th>PSNR ↑</th><th>SSIM ↑</th><th>LPIPS ↓</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr><td>FDK</td><td>19.40</td><td>0.383</td><td>0.380</td><td>21.94</td><td>0.348</td><td>0.366</td><td>18.92</td><td>0.227</td><td>0.374</td><td>20.09</td><td>0.319</td><td>0.373</td></tr>
+          <tr><td>SART</td><td>22.68</td><td>0.650</td><td>0.415</td><td>25.60</td><td>0.621</td><td>0.417</td><td>25.20</td><td>0.390</td><td>0.456</td><td>24.49</td><td>0.554</td><td>0.429</td></tr>
+          <tr><td>CGLS</td><td>18.56</td><td>0.346</td><td>0.463</td><td>19.95</td><td>0.314</td><td>0.452</td><td>17.36</td><td>0.149</td><td>0.455</td><td>18.62</td><td>0.269</td><td>0.457</td></tr>
+          <tr><td>PDHG-TV</td><td>22.25</td><td><strong>0.687</strong></td><td>0.426</td><td>24.75</td><td><strong>0.675</strong></td><td>0.446</td><td>23.83</td><td>0.435</td><td>0.559</td><td>23.61</td><td>0.599</td><td>0.477</td></tr>
+          <tr><td>IntraTomo</td><td>20.03</td><td>0.537</td><td>0.416</td><td>24.24</td><td>0.567</td><td>0.413</td><td>27.03</td><td>0.591</td><td>0.405</td><td>23.77</td><td>0.565</td><td>0.411</td></tr>
+          <tr><td>SAX-NeRF</td><td>17.76</td><td>0.492</td><td>0.468</td><td>20.87</td><td>0.482</td><td>0.469</td><td>24.04</td><td>0.534</td><td>0.446</td><td>20.89</td><td>0.503</td><td>0.461</td></tr>
+          <tr><td>R2-Gaussian</td><td>20.06</td><td>0.631</td><td>0.405</td><td>24.43</td><td>0.678</td><td>0.393</td><td><strong>27.67</strong></td><td><strong>0.715</strong></td><td>0.387</td><td>24.06</td><td><strong>0.674</strong></td><td>0.395</td></tr>
+          <tr><td><strong>Ours (2)</strong></td><td><strong>26.54</strong></td><td>0.610</td><td><strong>0.404</strong></td><td><strong>27.19</strong></td><td>0.616</td><td><strong>0.395</strong></td><td>27.09</td><td>0.609</td><td>0.389</td><td><strong>26.94</strong></td><td>0.612</td><td><strong>0.396</strong></td></tr>
+          <tr><td><strong>Ours (3)</strong></td><td>25.64</td><td>0.627</td><td>0.409</td><td>27.02</td><td>0.632</td><td>0.400</td><td>27.05</td><td>0.644</td><td>0.399</td><td>26.57</td><td>0.634</td><td>0.402</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="title is-5">Basis volume reconstruction on the synthetic dataset</h3>
+      <p class="content">Photoelectric (PE), Compton and K-edge bases compared against the known ground-truth coefficients.</p>
+      <div class="table-container">
+        <table class="table is-fullwidth is-striped is-narrow">
+          <thead>
+          <tr>
+            <th rowspan="2">Method</th>
+            <th colspan="2">PE</th><th colspan="2">Compton</th><th colspan="2">K-edge</th><th colspan="2">Average</th>
+          </tr>
+          <tr>
+            <th>PSNR ↑</th><th>SSIM ↑</th><th>PSNR ↑</th><th>SSIM ↑</th><th>PSNR ↑</th><th>SSIM ↑</th><th>PSNR ↑</th><th>SSIM ↑</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr><td>FDK</td><td>20.04</td><td>0.548</td><td>21.41</td><td>0.694</td><td>25.64</td><td>0.573</td><td>22.36</td><td>0.605</td></tr>
+          <tr><td>SART</td><td>20.81</td><td>0.666</td><td>21.44</td><td>0.779</td><td>25.90</td><td>0.596</td><td><strong>22.72</strong></td><td>0.681</td></tr>
+          <tr><td>CGLS</td><td>20.09</td><td>0.684</td><td><strong>21.63</strong></td><td><strong>0.806</strong></td><td>25.61</td><td>0.606</td><td>22.44</td><td>0.699</td></tr>
+          <tr><td>PDHG-TV</td><td>20.67</td><td>0.720</td><td>21.38</td><td>0.808</td><td><strong>26.03</strong></td><td>0.597</td><td>22.70</td><td>0.708</td></tr>
+          <tr><td><strong>Ours (2)</strong></td><td>23.64</td><td>0.853</td><td>15.56</td><td>0.814</td><td>–</td><td>–</td><td>19.60</td><td>0.833</td></tr>
+          <tr><td><strong>Ours (3)</strong></td><td><strong>23.82</strong></td><td><strong>0.863</strong></td><td>15.28</td><td>0.808</td><td>20.59</td><td><strong>0.898</strong></td><td>19.89</td><td><strong>0.856</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="title is-5">Basis material decomposition on the synthetic dataset</h3>
+      <p class="content">
+        Evaluated against the segmented ground-truth material maps. No traditional or learning-based baseline produces
+        one-step material maps with direct RGB output, so we compare our two variants against each other.
+      </p>
+      <div class="table-container">
+        <table class="table is-fullwidth is-striped is-narrow">
+          <thead>
+          <tr><th>Method</th><th>PSNR ↑</th><th>SSIM ↑</th><th>LPIPS ↓</th></tr>
+          </thead>
+          <tbody>
+          <tr><td>Ours (2)</td><td>30.11</td><td>0.985</td><td>0.062</td></tr>
+          <tr><td><strong>Ours (3)</strong></td><td><strong>30.97</strong></td><td><strong>0.989</strong></td><td><strong>0.047</strong></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+  <!-- End results tables -->
+
+  <!-- Ablations -->
+  <section class="section hero is-light" id="ablations">
+    <div class="container is-max-desktop">
+      <h2 class="title is-3 has-text-centered">Ablation Studies</h2>
+      <div class="content has-text-justified">
+        <p>
+          We ablate our model on the multi-energy bird chest dataset along three axes. <b>(a) Held-out energy channel:</b>
+          removing the middle channel at 80 keV costs relatively little because the model interpolates between two observed
+          energies, while holding out 50 or 120 keV requires extrapolation beyond the trained range and degrades clearly;
+          Ours (3) degrades more than Ours (2), indicating that the K-edge basis relies more strongly on channel-specific
+          information. <b>(b) Sparse views:</b> quality decreases consistently with fewer training views, but reducing from
+          75 to 25 views costs less than 1 dB per channel, and only at 10 views do the per-view scores spread widely.
+          <b>(c) Component ablation:</b> disabling K-edge freezing, TV regularization or the per-basis densification
+          thresholds barely changes the projection metrics, since these components control how attenuation is split across
+          the bases while a projection only measures the total attenuation along a ray — without them, however, the basis
+          coefficients collapse and the decomposition fails. Replacing the polychromatic energy integral by a single
+          monochromatic evaluation per channel scores best on projections, since it can fit each channel independently,
+          which shows that the spectral forward model requires a precise spectral configuration.
+        </p>
+      </div>
+
+      <div class="table-container">
+        <table class="table is-fullwidth is-striped is-narrow">
+          <thead>
+          <tr>
+            <th rowspan="2">Ablation</th><th rowspan="2">Configuration</th>
+            <th colspan="3">50 keV</th><th colspan="3">80 keV</th><th colspan="3">120 keV</th>
+          </tr>
+          <tr>
+            <th>PSNR ↑</th><th>SSIM ↑</th><th>LPIPS ↓</th>
+            <th>PSNR ↑</th><th>SSIM ↑</th><th>LPIPS ↓</th>
+            <th>PSNR ↑</th><th>SSIM ↑</th><th>LPIPS ↓</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr><td rowspan="3">(a) Held-out channel, Ours (2)</td><td>50 keV excluded</td><td>30.05</td><td>0.921</td><td>0.291</td><td>36.67</td><td>0.946</td><td>0.260</td><td>39.48</td><td>0.947</td><td>0.311</td></tr>
+          <tr><td>80 keV excluded</td><td>33.28</td><td>0.928</td><td>0.284</td><td>34.79</td><td>0.941</td><td>0.254</td><td>39.50</td><td>0.950</td><td>0.310</td></tr>
+          <tr><td>120 keV excluded</td><td>33.46</td><td>0.929</td><td>0.281</td><td>36.21</td><td>0.949</td><td>0.254</td><td>30.92</td><td>0.878</td><td>0.321</td></tr>
+
+          <tr><td rowspan="3">(a) Held-out channel, Ours (3)</td><td>50 keV excluded</td><td>24.99</td><td>0.813</td><td>0.289</td><td>37.21</td><td>0.952</td><td>0.257</td><td>39.18</td><td>0.950</td><td>0.313</td></tr>
+          <tr><td>80 keV excluded</td><td>34.21</td><td>0.932</td><td>0.280</td><td>30.56</td><td>0.924</td><td>0.251</td><td>38.78</td><td>0.949</td><td>0.313</td></tr>
+          <tr><td>120 keV excluded</td><td>34.80</td><td>0.934</td><td>0.276</td><td>36.62</td><td>0.949</td><td>0.251</td><td>28.22</td><td>0.832</td><td>0.326</td></tr>
+
+          <tr><td rowspan="4">(b) Sparse views, Ours (3)</td><td>75 views (full)</td><td>33.76</td><td>0.930</td><td>0.282</td><td>36.79</td><td>0.949</td><td>0.254</td><td>39.03</td><td>0.949</td><td>0.313</td></tr>
+          <tr><td>50 views</td><td>33.63</td><td>0.929</td><td>0.281</td><td>36.61</td><td>0.947</td><td>0.253</td><td>38.86</td><td>0.948</td><td>0.312</td></tr>
+          <tr><td>25 views</td><td>33.00</td><td>0.922</td><td>0.279</td><td>35.96</td><td>0.942</td><td>0.250</td><td>38.46</td><td>0.946</td><td>0.314</td></tr>
+          <tr><td>10 views</td><td>30.73</td><td>0.889</td><td>0.289</td><td>33.88</td><td>0.916</td><td>0.259</td><td>37.14</td><td>0.932</td><td>0.318</td></tr>
+
+          <tr><td rowspan="5">(c) Components, Ours (3)</td><td>Full model</td><td>33.76</td><td>0.930</td><td>0.282</td><td>36.79</td><td>0.949</td><td>0.254</td><td>39.03</td><td>0.949</td><td>0.313</td></tr>
+          <tr><td>w/o K-edge freezing</td><td>33.79</td><td>0.931</td><td>0.282</td><td>36.78</td><td>0.949</td><td>0.254</td><td>38.95</td><td>0.949</td><td>0.314</td></tr>
+          <tr><td>w/o TV loss</td><td>33.77</td><td>0.931</td><td>0.283</td><td>36.78</td><td>0.949</td><td>0.254</td><td>39.01</td><td>0.950</td><td>0.314</td></tr>
+          <tr><td>w/o per-basis densify thresh.</td><td>33.64</td><td>0.930</td><td>0.286</td><td>36.65</td><td>0.949</td><td>0.257</td><td>38.90</td><td>0.949</td><td>0.313</td></tr>
+          <tr><td>w/o polychromatic model</td><td>34.31</td><td>0.933</td><td>0.284</td><td>37.20</td><td>0.951</td><td>0.257</td><td>39.20</td><td>0.950</td><td>0.312</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+  <!-- End ablations -->
+
+  <!-- Image carousel -->
+  <section class="hero is-small">
+    <div class="hero-body">
+      <div class="container">
+        <h2 class="title is-3 has-text-centered">Qualitative Results</h2>
+        <div id="results-carousel" class="carousel results-carousel">
+          <div class="item">
+            <img src="static/images/nvs_birdchest.png"
+                 alt="Novel view synthesis results on the multi-energy bird chest dataset with absolute error maps at 50, 80 and 120 keV"
+                 loading="lazy"/>
+            <h2 class="subtitle has-text-centered">
+              <b>Novel view synthesis</b> on the multi-energy bird chest dataset. For each method the left column shows the
+              rendered projection and the right column the absolute error w.r.t. the ground truth. Our method and
+              R2-Gaussian yield the darkest error maps, while our shared geometry additionally acts as an implicit denoiser
+              compared with the speckled per-channel error of FDK and CGLS.
+            </h2>
+          </div>
+          <div class="item">
+            <img src="static/images/reconstruction_birdchest.png"
+                 alt="Spectral CT reconstruction results on the multi-energy bird chest dataset: axial slices and outside volume renders at 50, 80 and 120 keV"
+                 loading="lazy"/>
+            <h2 class="subtitle has-text-centered">
+              <b>Spectral CT reconstruction</b> on the multi-energy bird chest dataset, shown as an axial slice and an
+              outside volume render per energy channel. Our reconstruction matches the intensity level of tissue and bone
+              most closely, whereas background noise remains challenging for all compared methods.
+            </h2>
+          </div>
+          <div class="item">
+            <img src="static/images/nvs_pomegranate.png"
+                 alt="Novel view synthesis qualitative results on the dual-energy pomegranate dataset"
+                 loading="lazy"/>
+            <h2 class="subtitle has-text-centered">
+              Novel view synthesis on the dual-energy pomegranate dataset. A test projection and its
+              absolute-error map are shown for the 50 keV and 70 keV channels.
+            </h2>
+          </div>
+          <div class="item">
+            <img src="static/images/reconstruction_pomegranate.png"
+                 alt="Spectral CT reconstruction qualitative results on the dual-energy pomegranate dataset"
+                 loading="lazy"/>
+            <h2 class="subtitle has-text-centered">
+              Spectral CT reconstruction on the dual-energy pomegranate dataset. An axial volume slice and an
+              outside volume render are shown for the 50 keV and 70 keV channels.
+            </h2>
+          </div>
+          <div class="item">
+            <img src="static/images/decomposition.png"
+                 alt="Basis material decomposition on the synthetic phantom with ground truth and on the real bird chest dataset"
+                 loading="lazy"/>
+            <h2 class="subtitle has-text-centered">
+              <b>Basis material decomposition.</b> Left: our synthetic phantom with ground truth and our prediction for two
+              views. Right: the real bird chest dataset, where no ground truth is available and colors indicate the dominant
+              recovered basis (violet: metal, greenish: soft tissue, bright: bone).
+            </h2>
+          </div>
+          <div class="item">
+            <img src="static/images/pomegranate_decomposition.png"
+                 alt="Basis material decomposition on the dual-energy pomegranate dataset"
+                 loading="lazy"/>
+            <h2 class="subtitle has-text-centered">
+              Basis material decomposition of the pomegranate dataset. The fruit is attributed almost entirely to
+              the soft-tissue basis, while the bone and K-edge bases remain essentially empty.
+            </h2>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- End image carousel -->
+
+  <!-- BibTeX citation -->
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <div class="bibtex-header">
+        <h2 class="title">BibTeX</h2>
+        <button class="copy-bibtex-btn" onclick="copyBibTeX()" title="Copy BibTeX to clipboard">
+          <i class="fas fa-copy"></i>
+          <span class="copy-text">Copy</span>
+        </button>
+      </div>
+      <pre id="bibtex-code"><code>@article{vos2026spectralctgaussians,
+  title={SpectralCTGaussians: Projection-Domain Reconstruction and Basis Material Decomposition for Spectral CT using 3D Gaussian Splatting},
+  author={Vos, Reinout and Sinha, Saptarshi Neil and Weinmann, Michael},
+  journal={arXiv preprint arXiv:&lt;ARXIV PAPER ID&gt;},
+  year={2026}
+}</code></pre>
+    </div>
+  </section>
+  <!-- End BibTeX citation -->
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p>
+            This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank" rel="noopener">Academic Project Page Template</a> which was adopted from the <a href="https://nerfies.github.io" target="_blank" rel="noopener">Nerfies</a> project page.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
